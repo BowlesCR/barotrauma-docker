@@ -29,10 +29,11 @@ RUN apt-get update && \
 
 # Install the barotrauma server
 RUN steamcmd \
-    +force_install_dir /barotrauma \
+    +force_install_dir "${INSTALL_LOC}" \
     +login anonymous \
     +app_update "${APPID}" validate \
-    +quit
+    +quit && \
+    rm -rf "${INSTALL_LOC}"/.local/share/Steam/
 
 # Download and Install Lua for Barotrauma
 RUN if [[ -n "${LUA_SERVER}" ]] ; then curl -L https://github.com/evilfactory/LuaCsForBarotrauma/releases/download/latest/luacsforbarotrauma_patch_linux_server.tar.gz | tar -xzv -C "${INSTALL_LOC}"; fi
