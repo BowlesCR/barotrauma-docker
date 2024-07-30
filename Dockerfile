@@ -3,10 +3,10 @@ FROM steamcmd/steamcmd:ubuntu
 # Directories
 ENV INSTALL_LOC="/barotrauma"
 ENV CONF_BASE="/config_readonly"
-ENV CONFIG_LOC="${INSTALL_LOC}/volumes/config"
-ENV WORKSHOP_MODS_LOC="${INSTALL_LOC}/volumes/workshopMods"
-ENV LOCAL_MODS_LOC="${INSTALL_LOC}/volumes/localMods"
-ENV SAVES_LOC="${INSTALL_LOC}/volumes/Multiplayer"
+ENV CONFIG_LOC="/volumes/config"
+ENV WORKSHOP_MODS_LOC="/volumes/workshopMods"
+ENV LOCAL_MODS_LOC="/volumes/localMods"
+ENV SAVES_LOC="/volumes/Multiplayer"
 
 ENV HOME="${INSTALL_LOC}"
 
