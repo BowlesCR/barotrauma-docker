@@ -20,12 +20,11 @@ ARG APPID=1026340
 ARG LUA_SERVER
 
 # Update and install unicode symbols
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get upgrade --assume-yes && \
-    apt-get install --no-install-recommends --assume-yes icu-devtools apt-utils curl tar && \
-    apt-get clean && \
-    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
-    # rm call is probably redundant after the clean call above
+    apt-get install --no-install-recommends --assume-yes icu-devtools apt-utils curl tar
 
 # Install the barotrauma server
 RUN steamcmd \
@@ -54,7 +53,8 @@ RUN mkdir -p "${CONFIG_LOC}" "${CONF_BASE}"
 COPY serversettings.xml "${INSTALL_LOC}/serversettings-patch.xml"
 RUN [ ! -f "${INSTALL_LOC}/serversettings.xml" ] && mv "${INSTALL_LOC}/serversettings-patch.xml" "${INSTALL_LOC}/serversettings.xml"
 
-RUN mv ${INSTALL_LOC}/serversettings.xml ${INSTALL_LOC}/Data/clientpermissions.xml ${INSTALL_LOC}/Data/permissionpresets.xml ${INSTALL_LOC}/Data/karmasettings.xml "${CONF_BASE}"
+RUN touch ${INSTALL_LOC}/serversettings.xml ${INSTALL_LOC}/Data/clientpermissions.xml ${INSTALL_LOC}/Data/permissionpresets.xml ${INSTALL_LOC}/Data/karmasettings.xml && \
+  mv ${INSTALL_LOC}/serversettings.xml ${INSTALL_LOC}/Data/clientpermissions.xml ${INSTALL_LOC}/Data/permissionpresets.xml ${INSTALL_LOC}/Data/karmasettings.xml "${CONF_BASE}"
 
 RUN ln -s "${CONFIG_LOC}/serversettings.xml" "${INSTALL_LOC}/serversettings.xml" && \
   ln -s ${CONFIG_LOC}/config_player.xml ${INSTALL_LOC}/config_player.xml && \
@@ -63,14 +63,14 @@ RUN ln -s "${CONFIG_LOC}/serversettings.xml" "${INSTALL_LOC}/serversettings.xml"
   ln -s ${CONFIG_LOC}/karmasettings.xml ${INSTALL_LOC}/Data/karmasettings.xml
 
 # Setup mods folder
-RUN mkdir -p "${INSTALL_LOC}/.local/share/Daedalic Entertainment GmbH/Barotrauma/WorkshopMods/Installed"
-RUN mv "${INSTALL_LOC}/.local/share/Daedalic Entertainment GmbH/Barotrauma/WorkshopMods/Installed" "${WORKSHOP_MODS_LOC}"
-RUN ln -s "${WORKSHOP_MODS_LOC}" "${INSTALL_LOC}/.local/share/Daedalic Entertainment GmbH/Barotrauma/WorkshopMods/Installed"
+RUN mkdir -p "${INSTALL_LOC}/.local/share/Daedalic Entertainment GmbH/Barotrauma/WorkshopMods/Installed" && \
+  mv "${INSTALL_LOC}/.local/share/Daedalic Entertainment GmbH/Barotrauma/WorkshopMods/Installed" "${WORKSHOP_MODS_LOC}" && \
+  ln -s "${WORKSHOP_MODS_LOC}" "${INSTALL_LOC}/.local/share/Daedalic Entertainment GmbH/Barotrauma/WorkshopMods/Installed"
 
 # Setup subs folder
-RUN mkdir -p "${INSTALL_LOC}/LocalMods"
-RUN mv "${INSTALL_LOC}/LocalMods" "${LOCAL_MODS_LOC}"
-RUN ln -s "${LOCAL_MODS_LOC}" "${INSTALL_LOC}/LocalMods"
+RUN mkdir -p "${INSTALL_LOC}/LocalMods" && \
+  mv "${INSTALL_LOC}/LocalMods" "${LOCAL_MODS_LOC}" && \
+  ln -s "${LOCAL_MODS_LOC}" "${INSTALL_LOC}/LocalMods"
 
 # Setup saves folder
 RUN mkdir -p "${INSTALL_LOC}/.local/share/Daedalic Entertainment GmbH" "${SAVES_LOC}" && \
